@@ -1,41 +1,56 @@
-//Get de l'API
-const url = "http://localhost:3000/api/products";
-
-fetch(url)
+//Get API from server
+fetch("http://localhost:3000/api/products")
 .then(response => response.json())
-.then(data => {
-    const product = data[0];
+.then(data => addProducts(data))
+
+
+//Fonction globale regroupant les sous-fonctions pour chaque création d'objet
+function addProducts(data) {
+    data.forEach(canape => {
+        
+    const { _id, imageUrl, altTxt, name, description } = canape
+        
+    const fnctId = makeId(_id)
+    const article = document.createElement("article")
+    const fnctImage = makeImg(imageUrl, altTxt)
+    const fnctName = makeName(name)
+    const fnctDesc = makeDesc(description)
     
-    //Boucle d'affichage des produits
-        for (let i = 0; i < data.length; i += 1) {
-    
-    //Création du bloc parent -> Lien vers le produit
-    const newA = document.createElement("a");
-    newA.href = "./product.html?id=productId";
-    const sectionProducts = document.getElementById("items");
-    sectionProducts.appendChild(newA);
-    
-    console.log(sectionProducts)
-    
-    //Remplissage des images et infos du produit
-    const article = document.createElement("article");
-    newA.appendChild(article);
-    
-    const imgElt = document.createElement("img");
-    imgElt.src = data[i].imageUrl;
-    imgElt.setAttribute("alt", product.altTxt);
-    
-    const nameElt = document.createElement("h3");
-    nameElt.innerText = data[i].name;
-    
-    const descriptionElt = document.createElement("p");
-    descriptionElt.innerText = data[i].description;
-    
-    article.appendChild(imgElt);
-    article.appendChild(nameElt);
-    article.appendChild(descriptionElt);
-    
-    
-        console.log(data)
-        }
+    appendChild(fnctId, article)
+    article.appendChild(fnctImage)
+    article.appendChild(fnctName)
+    article.appendChild(fnctDesc)
 })
+}
+
+function makeId(id) {
+        const linkId = document.createElement("a")
+        linkId.href = "./product.html?id=" + id
+        return linkId
+    }
+    
+    function appendChild(link, article) {
+        const parentLinkId = document.querySelector("#items")
+        parentLinkId.appendChild(link);
+        link.appendChild(article)
+    }
+    
+    function makeImg(imageUrl, altTxt) {
+        const img = document.createElement("img")
+        img.src = imageUrl
+        img.alt = altTxt
+        return img
+    }
+    function makeName(name) {
+        const h3 = document.createElement("h3")
+        h3.textContent = name
+        h3.classList.add("productName")
+        return h3
+    }
+    function makeDesc(desc) {
+        const dscr = document.createElement("p")
+        dscr.textContent = desc
+        dscr.classList.add("productDescription")
+        return dscr 
+    }
+    
