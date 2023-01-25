@@ -2,19 +2,14 @@
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const id = urlParams.get("id")
-if (id != null) {
-    let itemPrice
-    let imgUrl 
-    let altText
-    let namePrd
-}
+
 
 //Get API from server 
 fetch(`http://localhost:3000/api/products/${id}`)
 .then(response => response.json())
 .then(prd => getPrd(prd))
 
-//Fonction globale regroupant les sous-fonctions/élément
+//Fonction globale regroupant les sous-fonctions/objets
 function getPrd(prd) {
     const { altTxt, colors, description, imageUrl, name, price } = prd
     itemPrice = price
