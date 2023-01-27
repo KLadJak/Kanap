@@ -1,13 +1,15 @@
 //Get API from server
+function fetchAPI() {
 fetch("http://localhost:3000/api/products")
 .then(response => response.json())
 .then(data => addProducts(data))
+}
 
 //Boucle d'affichage des produits
 function addProducts(data) {
     data.forEach(canape => {
         
-        //Fonction globale regroupant les sous-fonctions pour chaque création d'objet
+    //Fonction globale regroupant les sous-fonctions pour chaque création d'objet
     const { _id, imageUrl, altTxt, name, description } = canape
         
     const fnctId = makeId(_id)
@@ -61,3 +63,4 @@ function makeId(id) {
         return dscr 
     }
     
+    fetchAPI()

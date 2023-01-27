@@ -1,21 +1,18 @@
 /*Récupération de l'ID(Params) du produit*/
-const queryString = window.location.search
-const urlParams = new URLSearchParams(queryString)
-const id = urlParams.get("id")
-
-
-//Get API from server 
+    const queryString = window.location.search
+    const urlParams = new URLSearchParams(queryString)
+    const id = urlParams.get("id")
+    
+//Get API from server
+function getAPI() {
 fetch(`http://localhost:3000/api/products/${id}`)
 .then(response => response.json())
 .then(prd => getPrd(prd))
+}
 
 //Fonction globale regroupant les sous-fonctions/objets
 function getPrd(prd) {
     const { altTxt, colors, description, imageUrl, name, price } = prd
-    itemPrice = price
-    imgUrl = imageUrl
-    altText = altTxt
-    namePrd = name
     makeImage(imageUrl, altTxt)
     makeName(name)
     makePrice(price)
@@ -78,25 +75,27 @@ function getLocalStorageCart() {
     
 //Si quantité null -> Message d'alerte
 function isCardIsInvalide(quantity, color) {
-    if (color.length === 0 || quantity.length === 0 || quantity === "0") {
+    if (color === "" || quantity.length === 0 || quantity === "0") {
         alert("Veuillez remplir tous les champs")
         return true
     }
+    //Si quantité invalide -> Message d'alerte
+    const itemQty = document.querySelector("input")
+    if (itemQty.value > Number(100) || itemQty.value < Number(1)) {
+        alert("Vous ne pouvez pas ajouter plus de 100 produits ou une quantité inférieur à 1")
+       return true
+    }
+    
 }
     
 //Fonction ajout d'un item au panier
 function addCart(color, quantity) {
     const data = {
         id: id,
-        name: namePrd,
         color: color,
         quantity: Number(quantity),
-        price: Number(itemPrice),
-        imageUrl: imgUrl,
-        altTxt: altText
     }
-        localStorage.setItem(id, JSON.stringify(data))
-        alert("Votre produit a bien été ajouté à votre panier")
+    localStorage.setItem(id, JSON.stringify(data))
+    alert("Votre produit a bien été ajouté à votre panier")
 }    
-
-        
+getAPI()
