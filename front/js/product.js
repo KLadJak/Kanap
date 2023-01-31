@@ -1,16 +1,16 @@
 /*Récupération de l'ID(Params) du produit*/
-    const queryString = window.location.search
-    const urlParams = new URLSearchParams(queryString)
-    const id = urlParams.get("id")
-    
+const queryString = window.location.search
+const urlParams = new URLSearchParams(queryString)
+const id = urlParams.get("id")
+
 //Get API from server
 function getAPI() {
-fetch(`http://localhost:3000/api/products/${id}`)
-.then(response => response.json())
-.then(prd => getPrd(prd))
+    fetch(`http://localhost:3000/api/products/${id}`)
+    .then(response => response.json())
+    .then(prd => getPrd(prd))
 }
 
-//Fonction globale regroupant les sous-fonctions/objets
+//Fonction array produit
 function getPrd(prd) {
     const { altTxt, colors, description, imageUrl, name, price } = prd
     makeImage(imageUrl, altTxt)
@@ -59,22 +59,26 @@ function makeOption(color) {
     });
 }
 
-const alertM = document.querySelector("#addToCart")
+//Fonction eventListener du panier user
+function getUserCart() {
+    const alertM = document.querySelector("#addToCart")
     if (alertM != null) {
         alertM.addEventListener("click", getLocalStorageCart)
+    }
 }
 
 //Fonction permettant de récupérer les items dans le localStorage
 function getLocalStorageCart() {
-        const quantity = document.querySelector("#quantity").value
-        const color = document.querySelector("#colors").value
+    const quantity = document.querySelector("#quantity").value
+    const color = document.querySelector("#colors").value
+    
+    if (isCardIsInvalide(quantity, color)) {return}
 
-        if (isCardIsInvalide(quantity, color)) {return}
-        addCart(color, quantity)
+    saveCart(color, quantity, id)
     }
     
-//Si quantité null -> Message d'alerte
-function isCardIsInvalide(quantity, color) {
+    //Si quantité null -> Message d'alerte
+    function isCardIsInvalide(quantity, color) {
     if (color === "" || quantity.length === 0 || quantity === "0") {
         alert("Veuillez remplir tous les champs")
         return true
@@ -87,15 +91,42 @@ function isCardIsInvalide(quantity, color) {
     }
     
 }
-    
+
 //Fonction ajout d'un item au panier
-function addCart(color, quantity) {
-    const data = {
+function saveCart(color, quantity, id) {
+    let dataCart = {
         id: id,
         color: color,
         quantity: Number(quantity),
     }
-    localStorage.setItem(id, JSON.stringify(data))
+    localStorage.setItem("cart", JSON.stringify(dataCart))
+    console.log(dataCart)
     alert("Votre produit a bien été ajouté à votre panier")
 }    
+function getProduct() {
+    let ls = localStorage.getItem("cart")
+    if (ls == null) {
+        return []
+    } else {
+    return JSON.parse(ls)
+    }
+}
+function addPrd(product) {
+    let add = getProduct()
+    add.push(product)
+    addCart(add)
+}
+getUserCart()
 getAPI()
+
+/*const qty = dataCart.quantity
+const qtyAdd = qty.reduce(
+        (sum, currentQty) => {
+            return sum += currentQty
+        }
+        )
+        return qtyAdd*/
+    
+    
+    
+    

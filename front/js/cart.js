@@ -25,7 +25,7 @@ function makeDivImage() {
     const blocArticle = document.querySelector('.cart__item');
     const divImage = document.createElement('div');
     divImage.classList.add('cart__item__img');
-    divImage.appendChild(blocImage);
+    divImage.appendChild(blocArticle);
     return divImage;
     
 }
