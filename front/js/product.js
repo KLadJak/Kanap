@@ -64,6 +64,7 @@ function getUserCart() {
     const alertM = document.querySelector("#addToCart")
     if (alertM != null) {
         alertM.addEventListener("click", getLocalStorageCart)
+        
     }
 }
 
@@ -71,14 +72,14 @@ function getUserCart() {
 function getLocalStorageCart() {
     const quantity = document.querySelector("#quantity").value
     const color = document.querySelector("#colors").value
-    
-    if (isCardIsInvalide(quantity, color)) {return}
-
-    saveCart(color, quantity, id)
+    if (isCardIsInvalide(quantity, color)) {
+        return
     }
-    
-    //Si quantité null -> Message d'alerte
-    function isCardIsInvalide(quantity, color) {
+    saveCart(color, quantity, id)
+}
+
+//Si quantité null -> Message d'alerte
+function isCardIsInvalide(quantity, color) {
     if (color === "" || quantity.length === 0 || quantity === "0") {
         alert("Veuillez remplir tous les champs")
         return true
@@ -88,8 +89,7 @@ function getLocalStorageCart() {
     if (itemQty.value > Number(100) || itemQty.value < Number(1)) {
         alert("Vous ne pouvez pas ajouter plus de 100 produits ou une quantité inférieur à 1")
        return true
-    }
-    
+    } 
 }
 
 //Fonction ajout d'un item au panier
@@ -97,36 +97,34 @@ function saveCart(color, quantity, id) {
     let dataCart = {
         id: id,
         color: color,
-        quantity: Number(quantity),
+        quantity: Number(quantity)
     }
-    localStorage.setItem("cart", JSON.stringify(dataCart))
-    console.log(dataCart)
-    alert("Votre produit a bien été ajouté à votre panier")
-}    
-function getProduct() {
-    let ls = localStorage.getItem("cart")
-    if (ls == null) {
-        return []
-    } else {
-    return JSON.parse(ls)
+    
+    let ls = JSON.parse(localStorage.getItem("cart"))
+    
+    
+    if (ls) {
+        let foundId = ls.find(qty => qty.id === dataCart.id)
+        let foundColor = ls.find(color => color.color === dataCart.color)
+
+        if (foundId !== undefined && foundColor!== undefined) {
+
+            foundId.quantity += Number(quantity)
+        localStorage.setItem("cart", JSON.stringify(ls))
+        alert("Votre produit a été ajouté à votre panier")
+        }
+        else{
+        ls.push(dataCart)
+        localStorage.setItem("cart", JSON.stringify(ls))
+        alert("Votre produit a été ajouté à votre panier")
+        }
     }
-}
-function addPrd(product) {
-    let add = getProduct()
-    add.push(product)
-    addCart(add)
+    else {
+        ls = []
+        ls.push(dataCart)
+        localStorage.setItem("cart", JSON.stringify(ls))
+        alert("Votre produit a été ajouté à votre panier")
+    }
 }
 getUserCart()
 getAPI()
-
-/*const qty = dataCart.quantity
-const qtyAdd = qty.reduce(
-        (sum, currentQty) => {
-            return sum += currentQty
-        }
-        )
-        return qtyAdd*/
-    
-    
-    
-    
