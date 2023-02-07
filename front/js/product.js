@@ -1,143 +1,143 @@
 /*Récupération de l'ID(Params) du produit*/
-const queryString = window.location.search
-const urlParams = new URLSearchParams(queryString)
-const id = urlParams.get("id")
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const id = urlParams.get("id");
 
 //Get API from server
 function getAPI() {
-    fetch(`http://localhost:3000/api/products/${id}`)
-    .then(response => response.json())
-    .then(prd => getPrd(prd))
+  fetch(`http://localhost:3000/api/products/${id}`)
+    .then((response) => response.json())
+    .then((prd) => getPrd(prd));
 }
 
 //Fonction array produit
 function getPrd(prd) {
-    const { altTxt, colors, description, imageUrl, name, price } = prd
-    makeImage(imageUrl, altTxt)
-    makeName(name)
-    makePrice(price)
-    makeDescription(description)
-    makeOption(colors)
+  const { altTxt, colors, description, imageUrl, name, price } = prd;
+  makeImage(imageUrl, altTxt);
+  makeName(name);
+  makePrice(price);
+  makeDescription(description);
+  makeOption(colors);
 }
 
 //Fonction incrémentation image produit
 function makeImage(imageUrl, altTxt) {
-    const prdImage = document.createElement("img")
-    prdImage.src = imageUrl
-    prdImage.alt = altTxt
-    const parent = document.querySelector(".item__img")
-    parent.appendChild(prdImage) 
+  const prdImage = document.createElement("img");
+  prdImage.src = imageUrl;
+  prdImage.alt = altTxt;
+  const parent = document.querySelector(".item__img");
+  parent.appendChild(prdImage);
 }
 
 //Fonction incrémentation nom produit
 function makeName(name) {
-    const prdName = document.getElementById("title")
-    prdName.innerText = name
-    return name
+  const prdName = document.getElementById("title");
+  prdName.innerText = name;
+  return name;
 }
 
 //Fonction incrémentation prix
 function makePrice(price) {
-    const prdPrice = document.getElementById("price")
-    prdPrice.innerText = price
+  const prdPrice = document.getElementById("price");
+  prdPrice.innerText = price;
 }
 
 //Fonction incrémentation description
 function makeDescription(description) {
-    const prdDescription = document.getElementById("description")
-    prdDescription.innerText = description
+  const prdDescription = document.getElementById("description");
+  prdDescription.innerText = description;
 }
 
 //Fonction incrémentation option de couleurs + boucle
 function makeOption(color) {
-    color.forEach(color => {
-        const eltOption = document.createElement("option")
-        eltOption.value = color
-        eltOption.textContent = color
-        const colors = document.querySelector("#colors")
-        colors.appendChild(eltOption)
-    });
+  color.forEach((color) => {
+    const eltOption = document.createElement("option");
+    eltOption.value = color;
+    eltOption.textContent = color;
+    const colors = document.querySelector("#colors");
+    colors.appendChild(eltOption);
+  });
 }
 
 //Fonction eventListener du panier user
 function getUserCart() {
-    const alertM = document.querySelector("#addToCart")
-    if (alertM != null) {
-        alertM.addEventListener("click", addLocalStorageCart)
-        
-    }
+  const button = document.querySelector("#addToCart");
+  if (button != null) {
+    button.addEventListener("click", addLocalStorageCart);
+  }
 }
 
 //Fonction d'ajout dans le ls par saisie user (quantité + couleur)
 function addLocalStorageCart() {
-    const quantity = document.querySelector("#quantity").value
-    const color = document.querySelector("#colors").value
-    if (isCardIsInvalide(quantity, color)) {
-        return
-    }
-    saveCart(color, quantity, id)
+  const quantity = document.querySelector("#quantity").value;
+  const color = document.querySelector("#colors").value;
+  if (isCardIsInvalide(quantity, color)) {
+    return;
+  }
+  saveCart(color, quantity, id);
 }
 
 //Si quantité null -> Message d'alerte
 function isCardIsInvalide(quantity, color) {
-    if (color === "" || quantity.length === 0 || quantity === "0") {
-        alert("Veuillez remplir tous les champs")
-        return true
-    }
-    //Si quantité invalide -> Message d'alerte
-    const itemQty = document.querySelector("input")
-    if (itemQty.value > Number(100) || itemQty.value < Number(1)) {
-        alert("Vous ne pouvez pas ajouter plus de 100 produits ou une quantité inférieur à 1")
-       return true
-    } 
+  if (color === "" || quantity.length === 0 || quantity === "0") {
+    alert("Veuillez remplir tous les champs");
+    return true;
+  }
+  //Si quantité invalide -> Message d'alerte
+  const itemQty = document.querySelector("input");
+  if (itemQty.value > Number(100) || itemQty.value < Number(1)) {
+    alert(
+      "Vous ne pouvez pas ajouter plus de 100 produits ou une quantité inférieur à 1"
+    );
+    return true;
+  }
 }
 
 //Fonction ajout d'un item au panier
 function saveCart(color, quantity, id) {
-    //Elements du array
-    let dataCart = {
-        id: `${id}-${color}`,
-        color: color,
-        quantity: Number(quantity)
-    }
-    //mise en forme du JSON
-    let ls = JSON.parse(localStorage.getItem("cart"))
-    //addition de la quantité dans le localStorage
-    if (ls) {
-        let foundId = ls.find(qty => qty.id === dataCart.id)
-        //let foundColor = ls.find(color => color.color === dataCart.color)
+  //Elements du array
+  let dataCart = {
+    id: `${id}-${color}`,
+    color: color,
+    quantity: Number(quantity),
+  };
+  //mise en forme du JSON
+  let ls = JSON.parse(localStorage.getItem("cart"));
+  //addition de la quantité dans le localStorage
+  if (ls) {
+    let foundId = ls.find((qty) => qty.id === dataCart.id);
     //paramètre de comparaison par id + color produit
-        if (foundId !== undefined) {
-            foundId.quantity += Number(quantity)
-            //limite de quantité totale
-            let number = 0
-            for (let product of ls) {
-                number += product.quantity
-            }
-            if (number > 100) {
-                return alert("Vous ne pouvez pas ajouter plus de 100 produits")
-            }
-            //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
-            else {
-                localStorage.setItem("cart", JSON.stringify(ls))
-                alert("Votre produit a été ajouté à votre panier")
-            }
-        }
-        //si id produit différent, ajout d'un index dans le localStorage
-        else{
-        ls.push(dataCart)
-        localStorage.setItem("cart", JSON.stringify(ls))
-        alert("Votre produit a été ajouté à votre panier")
-        }
+    if (foundId !== undefined) {
+      foundId.quantity += Number(quantity);
+      //limite de quantité totale
+      let number = 0;
+      for (let product of ls) {
+        number += product.quantity;
+      }
+      if (number > 100) {
+        return alert("Vous ne pouvez pas ajouter plus de 100 produits");
+      }
+      //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
+      else {
+        localStorage.setItem("cart", JSON.stringify(ls));
+        alert("Votre produit a été ajouté à votre panier");
+      }
     }
-    //Si produit différent, ajout dans le localStorage
+    //si id produit différent, ajout d'un index dans le localStorage
     else {
-        ls = []
-        ls.push(dataCart)
-        localStorage.setItem("cart", JSON.stringify(ls))
-        alert("Votre produit a été ajouté à votre panier")
+      ls.push(dataCart);
+      localStorage.setItem("cart", JSON.stringify(ls));
+      alert("Votre produit a été ajouté à votre panier");
     }
+  }
+  //Si produit différent ou null, ajout dans le localStorage
+  else {
+    ls = [];
+    ls.push(dataCart);
+    localStorage.setItem("cart", JSON.stringify(ls));
+    alert("Votre produit a été ajouté à votre panier");
+  }
 }
 
-getUserCart()
-getAPI()
+getUserCart();
+getAPI();
