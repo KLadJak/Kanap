@@ -63,13 +63,13 @@ function makeOption(color) {
 function getUserCart() {
     const alertM = document.querySelector("#addToCart")
     if (alertM != null) {
-        alertM.addEventListener("click", getLocalStorageCart)
+        alertM.addEventListener("click", addLocalStorageCart)
         
     }
 }
 
-//Fonction permettant de récupérer les items dans le localStorage
-function getLocalStorageCart() {
+//Fonction d'ajout dans le ls par saisie user (quantité + couleur)
+function addLocalStorageCart() {
     const quantity = document.querySelector("#quantity").value
     const color = document.querySelector("#colors").value
     if (isCardIsInvalide(quantity, color)) {
@@ -94,31 +94,43 @@ function isCardIsInvalide(quantity, color) {
 
 //Fonction ajout d'un item au panier
 function saveCart(color, quantity, id) {
+    //Elements du array
     let dataCart = {
-        id: id,
+        id: `${id}-${color}`,
         color: color,
         quantity: Number(quantity)
     }
-    
+    //mise en forme du JSON
     let ls = JSON.parse(localStorage.getItem("cart"))
-    
-    
+    //addition de la quantité dans le localStorage
     if (ls) {
         let foundId = ls.find(qty => qty.id === dataCart.id)
-        let foundColor = ls.find(color => color.color === dataCart.color)
-
-        if (foundId !== undefined && foundColor!== undefined) {
-
+        //let foundColor = ls.find(color => color.color === dataCart.color)
+    //paramètre de comparaison par id + color produit
+        if (foundId !== undefined) {
             foundId.quantity += Number(quantity)
-        localStorage.setItem("cart", JSON.stringify(ls))
-        alert("Votre produit a été ajouté à votre panier")
+            //limite de quantité totale
+            let number = 0
+            for (let product of ls) {
+                number += product.quantity
+            }
+            if (number > 100) {
+                return alert("Vous ne pouvez pas ajouter plus de 100 produits")
+            }
+            //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
+            else {
+                localStorage.setItem("cart", JSON.stringify(ls))
+                alert("Votre produit a été ajouté à votre panier")
+            }
         }
+        //si id produit différent, ajout d'un index dans le localStorage
         else{
         ls.push(dataCart)
         localStorage.setItem("cart", JSON.stringify(ls))
         alert("Votre produit a été ajouté à votre panier")
         }
     }
+    //Si produit différent, ajout dans le localStorage
     else {
         ls = []
         ls.push(dataCart)
@@ -126,5 +138,6 @@ function saveCart(color, quantity, id) {
         alert("Votre produit a été ajouté à votre panier")
     }
 }
+
 getUserCart()
 getAPI()
