@@ -106,28 +106,15 @@ function saveCart(color, quantity, id) {
   //addition de la quantité dans le localStorage
   if (ls) {
     let foundId = ls.find((qty) => qty.id === dataCart.id && qty.color === dataCart.color);
-    //paramètre de comparaison par id + color produit
+    //paramètre de comparaison et d'ajout produit par id + color
     if (foundId !== undefined) {
       foundId.quantity += Number(quantity);
-      //limite de quantité totale
-      let number = 0;
-      for (let product of ls) {
-        number += product.quantity;
-      }
-      if (number > 100) {
-        return alert("Vous ne pouvez pas ajouter plus de 100 produits");
-      }
-      //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
-      else {
-        localStorage.setItem("cart", JSON.stringify(ls));
-        alert("Votre produit a été ajouté à votre panier");
-      }
+      reducer(ls)
     }
-    //si id produit différent, ajout d'un index dans le localStorage
+      //si id produit différent, ajout d'un index dans le localStorage
     else {
       ls.push(dataCart);
-      localStorage.setItem("cart", JSON.stringify(ls));
-      alert("Votre produit a été ajouté à votre panier");
+      reducer(ls)
     }
   }
   //Si produit différent ou null, ajout dans le localStorage
@@ -139,5 +126,19 @@ function saveCart(color, quantity, id) {
   }
 }
 
+//Fonction limite de quantité totale
+function reducer(ls) {
+  let sommeQty = ls.reduce((accumulateur, element) => {
+    return accumulateur + element.quantity
+  }, 0)
+  if (sommeQty > 100) {
+    return alert("Vous ne pouvez pas ajouter plus de 100 produits");
+  }
+  //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
+  else  {
+    localStorage.setItem("cart", JSON.stringify(ls));
+    alert("Votre produit a été ajouté à votre panier");
+  }
+}
 getUserCart();
 getAPI();
