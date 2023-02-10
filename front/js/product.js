@@ -97,7 +97,7 @@ function isCardIsInvalide(quantity, color) {
 function saveCart(color, quantity, id) {
   //Elements du array
   let dataCart = {
-    id: `${id}-${color}`,
+    id: id,
     color: color,
     quantity: Number(quantity),
   };
@@ -105,7 +105,7 @@ function saveCart(color, quantity, id) {
   let ls = JSON.parse(localStorage.getItem("cart"));
   //addition de la quantité dans le localStorage
   if (ls) {
-    let foundId = ls.find((qty) => qty.id === dataCart.id);
+    let foundId = ls.find((qty) => qty.id === dataCart.id && qty.color === dataCart.color);
     //paramètre de comparaison par id + color produit
     if (foundId !== undefined) {
       foundId.quantity += Number(quantity);
