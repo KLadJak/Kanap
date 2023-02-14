@@ -18,6 +18,7 @@ function addProducts(data) {
     const fnctDesc = makeDesc(description);
 
     appendChild(fnctId, article);
+    
     article.appendChild(fnctImage);
     article.appendChild(fnctName);
     article.appendChild(fnctDesc);
