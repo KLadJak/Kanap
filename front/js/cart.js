@@ -8,7 +8,7 @@ function getLsUser() {
 function fetchAPI() {
   fetch("http://localhost:3000/api/products")
     .then((response) => response.json())
-    .then((data) => getDataProducts(data));
+    .then((data) => fetchDataProducts(data));
 }
 
 //Fonction de display des items Cart
@@ -20,6 +20,7 @@ function displayItems(cartObject) {
     const fnctDivInfo = makeDivInfo(cartObject);
     const fnctDivConSet = makeDivContainerSettings()
     const fnctDivQty = makeDivQty(cartObject)
+    const fnctDeleteItem = makeDeleteItem()
 
     const section = document.querySelector("#cart__items");
     
@@ -29,6 +30,7 @@ function displayItems(cartObject) {
     fnctDivContent.appendChild(fnctDivInfo);
     fnctDivContent.appendChild(fnctDivConSet)
     fnctDivConSet.appendChild(fnctDivQty);
+    fnctDivConSet.appendChild(fnctDeleteItem);
   });
 }
 
@@ -45,11 +47,16 @@ function makeArticle(cartObject) {
 function makeImgCart() {
   const div = document.createElement("div");
   div.classList.add("cart__item__img");
-  //const dataId = document.querySelector('article[data-id=""]');
+  //let dataIdClass = document.getElementsByClassName(".cart__item");
+  //console.log(dataIdClass.dataset.id);
+  //console.log(dataId.lenght);
+  //const idData = fetchAPI()
+  //if (dataId.dataset.id === idData._id) {
   const image = document.createElement("img");
   image.src = "../images/logo.png";
   image.alt = "altTxt";
   div.appendChild(image);
+//}
   return div;
 }
 
@@ -77,17 +84,20 @@ function makeDivInfo(cartObject) {
   return divInfo;
 }
 
+//Fonction création div container pour quantités
 function makeDivContainerSettings() {
   const divContainerSettings = document.createElement("div");
   divContainerSettings.classList.add("cart__item__content__settings")
   return divContainerSettings;
 }
 
+//Fonction création input quantity
 function makeDivQty(cartObject) {
   const divQty = document.createElement("div");
   divQty.classList.add("cart__item__content__settings__quantity")
   const qtyItem = document.createElement("p");
   qtyItem.textContent = "Qté : ";
+  divQty.appendChild(qtyItem)
   const inputQty = document.createElement("input");
   inputQty.type = "number";
   inputQty.classList.add("itemQuantity")
@@ -96,6 +106,66 @@ function makeDivQty(cartObject) {
   inputQty.max = "100";
   inputQty.value = cartObject.quantity
   divQty.appendChild(inputQty)
+  inputQty.addEventListener("change", addLs(inputQty))
   return divQty;
 }
+
+
+function addLs(inputQty) {
+  if (inputQty.value > Number(100) || inputQty.value < Number(1)) {
+    alert(
+      "Vous ne pouvez pas ajouter plus de 100 produits ou une quantité inférieur à 1"
+    );
+    return true;
+  }
+  /*else {
+    saveCart(color, quantity, id);
+  }*/
+}
+
+function saveCart(color, quantity, id) {
+  //Elements du array
+  let dataCart = {
+    id: id,
+    color: color,
+    quantity: Number(quantity),
+  };
+  //mise en forme du JSON
+  let ls = JSON.parse(localStorage.getItem("cart"));
+  //addition de la quantité dans le localStorage
+  if (ls) {
+    let foundId = ls.find((qty) => qty.id === dataCart.id && qty.color === dataCart.color);
+    //paramètre de comparaison et d'ajout produit par id + color
+    if (foundId !== undefined) {
+      foundId.quantity += Number(quantity);
+      reducer(ls)
+    }
+  }
+}
+
+//Fonction limite de quantité totale
+function reducer(ls) {
+  let sommeQty = ls.reduce((accumulateur, element) => {
+    return accumulateur + element.quantity
+  }, 0)
+  if (sommeQty > 100) {
+    return alert("Vous ne pouvez pas ajouter plus de 100 produits");
+  }
+  //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
+  else  {
+    localStorage.setItem("cart", JSON.stringify(ls));
+    alert("Votre produit a été ajouté à votre panier");
+  }
+}
+
+function makeDeleteItem() {
+  const divContainerDelete = document.createElement("div")
+  divContainerDelete.classList.add("cart__item__content__settings__delete")
+  const deleteItems = document.createElement("p")
+  deleteItems.classList.add("deleteItem")
+  deleteItems.textContent = "Supprimer"
+  divContainerDelete.appendChild(deleteItems)
+  return divContainerDelete
+}
+
 getLsUser();

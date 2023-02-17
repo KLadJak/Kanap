@@ -74,7 +74,9 @@ function addLocalStorageCart() {
   if (isCardIsInvalide(quantity, color)) {
     return;
   }
-  saveCart(color, quantity, id);
+  else {
+    saveCart(color, quantity, id);
+  }
 }
 
 //Si quantité null -> Message d'alerte
