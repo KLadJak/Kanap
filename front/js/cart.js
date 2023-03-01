@@ -8,27 +8,33 @@ function getLsUser() {
 function fetchAPI() {
   fetch("http://localhost:3000/api/products")
     .then((response) => response.json())
-    .then((data) => fetchDataProducts(data));
+    .then((data) => arrayAPI(data));
 }
 
+function arrayAPI(data) {
+  data.forEach((data) => {
+    const { _id, imageUrl, altTxt } = data;
+    makeImgCart(_id, imageUrl, altTxt);
+  });
+}
 //Fonction de display des items Cart
 function displayItems(cartObject) {
   cartObject.forEach((cartObject) => {
     const fnctArticle = makeArticle(cartObject);
-    const fnctImgCart = makeImgCart();
     const fnctDivContent = makeDivContent(cartObject);
     const fnctDivInfo = makeDivInfo(cartObject);
-    const fnctDivConSet = makeDivContainerSettings()
-    const fnctDivQty = makeDivQty(cartObject)
-    const fnctDeleteItem = makeDeleteItem()
+    const fnctDivConSet = makeDivContainerSettings();
+    const fnctImgCart = makeImgCart();
+    const fnctDivQty = makeDivQty(cartObject);
+    const fnctDeleteItem = makeDeleteItem();
 
     const section = document.querySelector("#cart__items");
-    
+
     section.appendChild(fnctArticle);
     fnctArticle.appendChild(fnctImgCart);
     fnctArticle.appendChild(fnctDivContent);
     fnctDivContent.appendChild(fnctDivInfo);
-    fnctDivContent.appendChild(fnctDivConSet)
+    fnctDivContent.appendChild(fnctDivConSet);
     fnctDivConSet.appendChild(fnctDivQty);
     fnctDivConSet.appendChild(fnctDeleteItem);
   });
@@ -36,36 +42,37 @@ function displayItems(cartObject) {
 
 //Fonction création Article
 function makeArticle(cartObject) {
-    const article = document.createElement("article");
-    article.classList.add("cart__item");
-    article.dataset.id = cartObject.id;
-    article.dataset.color = cartObject.color;
-    return article;
+  const article = document.createElement("article");
+  article.classList.add("cart__item");
+  article.dataset.id = cartObject.id;
+  article.dataset.color = cartObject.color;
+  return article;
 }
 
 //Fonction incrémentation image produit
-function makeImgCart() {
+function makeImgCart(_id, imageUrl, altTxt) {
+  let cart = localStorage.getItem("cart");
+  let cartObject = JSON.parse(cart);
   const div = document.createElement("div");
   div.classList.add("cart__item__img");
-  //let dataIdClass = document.getElementsByClassName(".cart__item");
-  //console.log(dataIdClass.dataset.id);
-  //console.log(dataId.lenght);
-  //const idData = fetchAPI()
-  //if (dataId.dataset.id === idData._id) {
-  const image = document.createElement("img");
-  image.src = "../images/logo.png";
-  image.alt = "altTxt";
-  div.appendChild(image);
-//}
+  cartObject.forEach((product) => {
+    if (_id === product.id && product.id !== undefined) {
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = altTxt;
+      console.log(div)
+      return div.appendChild(image);
+    }
+  });
   return div;
 }
 
 //Fonction création div container pour infos produit
 function makeDivContent(cartObject) {
-    const divContent = document.createElement("div");
-    divContent.classList.add("cart__item__content");
-    makeDivInfo(cartObject);
-    return divContent;
+  const divContent = document.createElement("div");
+  divContent.classList.add("cart__item__content");
+  makeDivInfo(cartObject);
+  return divContent;
 }
 
 //Fonction création div infos produit
@@ -87,85 +94,53 @@ function makeDivInfo(cartObject) {
 //Fonction création div container pour quantités
 function makeDivContainerSettings() {
   const divContainerSettings = document.createElement("div");
-  divContainerSettings.classList.add("cart__item__content__settings")
+  divContainerSettings.classList.add("cart__item__content__settings");
   return divContainerSettings;
 }
 
 //Fonction création input quantity
 function makeDivQty(cartObject) {
   const divQty = document.createElement("div");
-  divQty.classList.add("cart__item__content__settings__quantity")
+  divQty.classList.add("cart__item__content__settings__quantity");
   const qtyItem = document.createElement("p");
   qtyItem.textContent = "Qté : ";
-  divQty.appendChild(qtyItem)
+  divQty.appendChild(qtyItem);
   const inputQty = document.createElement("input");
   inputQty.type = "number";
-  inputQty.classList.add("itemQuantity")
-  inputQty.name = "itemQuantity"
-  inputQty.min = "1"
+  inputQty.classList.add("itemQuantity");
+  inputQty.name = "itemQuantity";
+  inputQty.min = "1";
   inputQty.max = "100";
-  inputQty.value = cartObject.quantity
-  divQty.appendChild(inputQty)
-  inputQty.addEventListener("change", addLs(inputQty))
+  inputQty.value = cartObject.quantity;
+  inputQty.addEventListener("change", () => addLs(cartObject.id, inputQty.value));
+  divQty.appendChild(inputQty);
   return divQty;
 }
 
-
-function addLs(inputQty) {
-  if (inputQty.value > Number(100) || inputQty.value < Number(1)) {
-    alert(
-      "Vous ne pouvez pas ajouter plus de 100 produits ou une quantité inférieur à 1"
-    );
-    return true;
-  }
-  /*else {
-    saveCart(color, quantity, id);
-  }*/
-}
-
-function saveCart(color, quantity, id) {
-  //Elements du array
-  let dataCart = {
-    id: id,
-    color: color,
-    quantity: Number(quantity),
-  };
-  //mise en forme du JSON
-  let ls = JSON.parse(localStorage.getItem("cart"));
-  //addition de la quantité dans le localStorage
-  if (ls) {
-    let foundId = ls.find((qty) => qty.id === dataCart.id && qty.color === dataCart.color);
-    //paramètre de comparaison et d'ajout produit par id + color
-    if (foundId !== undefined) {
-      foundId.quantity += Number(quantity);
-      reducer(ls)
-    }
-  }
-}
-
 //Fonction limite de quantité totale
-function reducer(ls) {
-  let sommeQty = ls.reduce((accumulateur, element) => {
-    return accumulateur + element.quantity
-  }, 0)
-  if (sommeQty > 100) {
-    return alert("Vous ne pouvez pas ajouter plus de 100 produits");
-  }
-  //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
-  else  {
-    localStorage.setItem("cart", JSON.stringify(ls));
-    alert("Votre produit a été ajouté à votre panier");
-  }
-}
+// function reducer(ls) {
+//   let sommeQty = ls.reduce((accumulateur, element) => {
+//     return accumulateur + element.quantity
+//   }, 0)
+//   if (sommeQty > 100) {
+//     return alert("Vous ne pouvez pas ajouter plus de 100 produits");
+//   }
+//   //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
+//   else  {
+//     localStorage.setItem("cart", JSON.stringify(ls));
+//     alert("Votre produit a été ajouté à votre panier");
+//   }
+// }
 
 function makeDeleteItem() {
-  const divContainerDelete = document.createElement("div")
-  divContainerDelete.classList.add("cart__item__content__settings__delete")
-  const deleteItems = document.createElement("p")
-  deleteItems.classList.add("deleteItem")
-  deleteItems.textContent = "Supprimer"
-  divContainerDelete.appendChild(deleteItems)
-  return divContainerDelete
+  const divContainerDelete = document.createElement("div");
+  divContainerDelete.classList.add("cart__item__content__settings__delete");
+  const deleteItems = document.createElement("p");
+  deleteItems.classList.add("deleteItem");
+  deleteItems.textContent = "Supprimer";
+  divContainerDelete.appendChild(deleteItems);
+  return divContainerDelete;
 }
 
 getLsUser();
+fetchAPI();
