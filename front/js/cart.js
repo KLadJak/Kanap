@@ -10,15 +10,15 @@ function fetchAPI() {
   cartObject.map(product => {
    return fetch(`http://localhost:3000/api/products/${product.id}`)
     .then((response) => response.json())
-    .then((data) => displayItems(data));
+    .then((data) => displayItems(data, product));
   })
 }
 
 //Fonction de display des items Cart
-function displayItems(data) {
+function displayItems(data, product) {
     const fnctArticle = makeArticle();
     const fnctDivContent = makeDivContent(data);
-    const fnctDivInfo = makeDivInfo(data);
+    const fnctDivInfo = makeDivInfo(data, product);
     const fnctDivConSet = makeDivContainerSettings();
     const fnctImgCart = makeImgCart(data);
     const fnctDivQty = makeDivQty();
@@ -60,20 +60,17 @@ function makeImgCart(data) {
 function makeDivContent(data) {
   const divContent = document.createElement("div");
   divContent.classList.add("cart__item__content");
-  makeDivInfo(data);
   return divContent;
 }
 
 //Fonction création div infos produit
-function makeDivInfo(data) {
+function makeDivInfo(data, product) {
   const divInfo = document.createElement("div");
   divInfo.classList.add("cart__item__content__description");
   const nameItem = document.createElement("h2");
   nameItem.textContent = data.name;
   const color = document.createElement("p");
-  cartObject.map(product => {
-    color.textContent = product.color;
-  })
+  color.textContent = product.color;
   const priceItem = document.createElement("p");
   priceItem.textContent = data.price + "€";
   divInfo.appendChild(nameItem);
