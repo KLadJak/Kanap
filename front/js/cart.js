@@ -1,31 +1,27 @@
-function getLsUser() {
-  let cart = localStorage.getItem("cart");
-  let cartObject = JSON.parse(cart);
-  displayItems(cartObject);
-}
+const cart = localStorage.getItem("cart");
+const cartObject = JSON.parse(cart);
+
+// function getLsUser() {
+//   displayItems(cartObject);
+// }
 
 //fetch API
 function fetchAPI() {
-  fetch("http://localhost:3000/api/products")
+  cartObject.map(product => {
+   return fetch(`http://localhost:3000/api/products/${product.id}`)
     .then((response) => response.json())
-    .then((data) => arrayAPI(data));
+    .then((data) => displayItems(data));
+  })
 }
 
-function arrayAPI(data) {
-  data.forEach((data) => {
-    const { _id, imageUrl, altTxt } = data;
-    makeImgCart(_id, imageUrl, altTxt);
-  });
-}
 //Fonction de display des items Cart
-function displayItems(cartObject) {
-  cartObject.forEach((cartObject) => {
-    const fnctArticle = makeArticle(cartObject);
-    const fnctDivContent = makeDivContent(cartObject);
-    const fnctDivInfo = makeDivInfo(cartObject);
+function displayItems(data) {
+    const fnctArticle = makeArticle();
+    const fnctDivContent = makeDivContent(data);
+    const fnctDivInfo = makeDivInfo(data);
     const fnctDivConSet = makeDivContainerSettings();
-    const fnctImgCart = makeImgCart();
-    const fnctDivQty = makeDivQty(cartObject);
+    const fnctImgCart = makeImgCart(data);
+    const fnctDivQty = makeDivQty();
     const fnctDeleteItem = makeDeleteItem();
 
     const section = document.querySelector("#cart__items");
@@ -37,11 +33,10 @@ function displayItems(cartObject) {
     fnctDivContent.appendChild(fnctDivConSet);
     fnctDivConSet.appendChild(fnctDivQty);
     fnctDivConSet.appendChild(fnctDeleteItem);
-  });
 }
 
 //Fonction création Article
-function makeArticle(cartObject) {
+function makeArticle() {
   const article = document.createElement("article");
   article.classList.add("cart__item");
   article.dataset.id = cartObject.id;
@@ -50,41 +45,37 @@ function makeArticle(cartObject) {
 }
 
 //Fonction incrémentation image produit
-function makeImgCart(_id, imageUrl, altTxt) {
-  let cart = localStorage.getItem("cart");
-  let cartObject = JSON.parse(cart);
+function makeImgCart(data) {
   const div = document.createElement("div");
   div.classList.add("cart__item__img");
-  cartObject.forEach((product) => {
-    if (_id === product.id && product.id !== undefined) {
       const image = document.createElement("img");
-      image.src = imageUrl;
-      image.alt = altTxt;
+      image.src = data.imageUrl;
+      image.alt = data.altTxt;
       console.log(div)
-      return div.appendChild(image);
-    }
-  });
+      div.appendChild(image);
   return div;
 }
 
 //Fonction création div container pour infos produit
-function makeDivContent(cartObject) {
+function makeDivContent(data) {
   const divContent = document.createElement("div");
   divContent.classList.add("cart__item__content");
-  makeDivInfo(cartObject);
+  makeDivInfo(data);
   return divContent;
 }
 
 //Fonction création div infos produit
-function makeDivInfo(cartObject) {
+function makeDivInfo(data) {
   const divInfo = document.createElement("div");
   divInfo.classList.add("cart__item__content__description");
   const nameItem = document.createElement("h2");
-  nameItem.textContent = "name";
+  nameItem.textContent = data.name;
   const color = document.createElement("p");
-  color.textContent = cartObject.color;
+  cartObject.map(product => {
+    color.textContent = product.color;
+  })
   const priceItem = document.createElement("p");
-  priceItem.textContent = "Number(price)";
+  priceItem.textContent = data.price + "€";
   divInfo.appendChild(nameItem);
   divInfo.appendChild(priceItem);
   divInfo.appendChild(color);
@@ -99,7 +90,7 @@ function makeDivContainerSettings() {
 }
 
 //Fonction création input quantity
-function makeDivQty(cartObject) {
+function makeDivQty() {
   const divQty = document.createElement("div");
   divQty.classList.add("cart__item__content__settings__quantity");
   const qtyItem = document.createElement("p");
@@ -112,7 +103,7 @@ function makeDivQty(cartObject) {
   inputQty.min = "1";
   inputQty.max = "100";
   inputQty.value = cartObject.quantity;
-  inputQty.addEventListener("change", () => addLs(cartObject.id, inputQty.value));
+  //inputQty.addEventListener("change", () => addLs(cartObject.id, inputQty.value));
   divQty.appendChild(inputQty);
   return divQty;
 }
@@ -142,5 +133,5 @@ function makeDeleteItem() {
   return divContainerDelete;
 }
 
-getLsUser();
+//getLsUser();
 fetchAPI();
