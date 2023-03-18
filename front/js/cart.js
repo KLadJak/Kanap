@@ -17,11 +17,11 @@ function fetchAPI() {
 //Fonction de display des items Cart
 function displayItems(data, product) {
     const fnctArticle = makeArticle();
-    const fnctDivContent = makeDivContent(data);
+    const fnctDivContent = makeDivContent();
     const fnctDivInfo = makeDivInfo(data, product);
     const fnctDivConSet = makeDivContainerSettings();
     const fnctImgCart = makeImgCart(data);
-    const fnctDivQty = makeDivQty();
+    const fnctDivQty = makeDivQty(product);
     const fnctDeleteItem = makeDeleteItem();
 
     const section = document.querySelector("#cart__items");
@@ -57,7 +57,7 @@ function makeImgCart(data) {
 }
 
 //Fonction création div container pour infos produit
-function makeDivContent(data) {
+function makeDivContent() {
   const divContent = document.createElement("div");
   divContent.classList.add("cart__item__content");
   return divContent;
@@ -87,7 +87,7 @@ function makeDivContainerSettings() {
 }
 
 //Fonction création input quantity
-function makeDivQty() {
+function makeDivQty(product) {
   const divQty = document.createElement("div");
   divQty.classList.add("cart__item__content__settings__quantity");
   const qtyItem = document.createElement("p");
@@ -99,7 +99,7 @@ function makeDivQty() {
   inputQty.name = "itemQuantity";
   inputQty.min = "1";
   inputQty.max = "100";
-  inputQty.value = cartObject.quantity;
+  inputQty.value = product.quantity;
   //inputQty.addEventListener("change", () => addLs(cartObject.id, inputQty.value));
   divQty.appendChild(inputQty);
   return divQty;
