@@ -1,10 +1,6 @@
 const cart = localStorage.getItem("cart");
 const cartObject = JSON.parse(cart);
 
-// function getLsUser() {
-//   displayItems(cartObject);
-// }
-
 //fetch API
 function fetchAPI() {
   cartObject.map(product => {
@@ -16,7 +12,7 @@ function fetchAPI() {
 
 //Fonction de display des items Cart
 function displayItems(data, product) {
-    const fnctArticle = makeArticle();
+    const fnctArticle = makeArticle(product);
     const fnctDivContent = makeDivContent();
     const fnctDivInfo = makeDivInfo(data, product);
     const fnctDivConSet = makeDivContainerSettings();
@@ -36,11 +32,11 @@ function displayItems(data, product) {
 }
 
 //Fonction création Article
-function makeArticle() {
+function makeArticle(product) {
   const article = document.createElement("article");
   article.classList.add("cart__item");
-  article.dataset.id = cartObject.id;
-  article.dataset.color = cartObject.color;
+  article.dataset.id = product.id;
+  article.dataset.color = product.color;
   return article;
 }
 
@@ -51,7 +47,6 @@ function makeImgCart(data) {
       const image = document.createElement("img");
       image.src = data.imageUrl;
       image.alt = data.altTxt;
-      console.log(div)
       div.appendChild(image);
   return div;
 }
@@ -100,9 +95,17 @@ function makeDivQty(product) {
   inputQty.min = "1";
   inputQty.max = "100";
   inputQty.value = product.quantity;
-  //inputQty.addEventListener("change", () => addLs(cartObject.id, inputQty.value));
   divQty.appendChild(inputQty);
+  inputQty.addEventListener("change", () => addLs(product.quantity, inputQty.value))
   return divQty;
+}
+
+//Fonction de changement de la value de quantity
+function addLs(product, qty) {
+  const itemUpdate = cartObject.find((itemUpdated) => itemUpdated.quantity === product)
+  itemUpdate.quantity = Number(qty)
+  console.log(itemUpdate)
+  itemUpdate.push(product.quantity)
 }
 
 //Fonction limite de quantité totale
@@ -130,5 +133,4 @@ function makeDeleteItem() {
   return divContainerDelete;
 }
 
-//getLsUser();
 fetchAPI();
