@@ -133,7 +133,6 @@ function makeDeleteItem(product) {
   deleteItems.textContent = "Supprimer";
   divContainerDelete.addEventListener("click", () => {
     const itemToDelete = cartObject.findIndex((item) => item === product)
-    console.log(itemToDelete)
     cartObject.splice(itemToDelete, 1)
     localStorage.setItem("cart", JSON.stringify(cartObject))
     location.reload();
