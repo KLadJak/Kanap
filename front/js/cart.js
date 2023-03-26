@@ -133,9 +133,9 @@ function makeDeleteItem(product) {
   deleteItems.textContent = "Supprimer";
   divContainerDelete.addEventListener("click", () => {
     const itemToDelete = cartObject.find((item) => item === product)
-    console.log(itemToDelete)
     cartObject.splice(itemToDelete, 1)
-    console.log(cartObject.lenght)
+    localStorage.setItem("cart", JSON.stringify(cartObject))
+    location.reload();
   })
   divContainerDelete.appendChild(deleteItems);
   return divContainerDelete;
