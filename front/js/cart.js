@@ -1,5 +1,7 @@
-const cart = localStorage.getItem("cart");
-const cartObject = JSON.parse(cart);
+// const cartArray = []
+const cartGet = localStorage.getItem("cart");
+const cartObject = JSON.parse(cartGet);
+// cartArray.push(cartObject)
 
 //fetch API
 function fetchAPI() {
@@ -18,7 +20,7 @@ function displayItems(data, product) {
     const fnctDivConSet = makeDivContainerSettings();
     const fnctImgCart = makeImgCart(data);
     const fnctDivQty = makeDivQty(product);
-    const fnctDeleteItem = makeDeleteItem();
+    const fnctDeleteItem = makeDeleteItem(product);
 
     const section = document.querySelector("#cart__items");
 
@@ -96,16 +98,19 @@ function makeDivQty(product) {
   inputQty.max = "100";
   inputQty.value = product.quantity;
   divQty.appendChild(inputQty);
-  inputQty.addEventListener("change", () => addLs(product.quantity, inputQty.value))
+  inputQty.addEventListener("change", () => addLs(product, inputQty.value))
   return divQty;
 }
-
+console.log(cartGet)
 //Fonction de changement de la value de quantity
-function addLs(product, qty) {
-  const itemUpdate = cartObject.find((itemUpdated) => itemUpdated.quantity === product)
-  itemUpdate.quantity = Number(qty)
-  console.log(itemUpdate)
-  itemUpdate.push(product.quantity)
+function addLs(product, inputQty) {
+  const itemUpdate = cartObject.findIndex(itemUpdated => itemUpdated.id === product.id)
+  itemUpdate.quantity = Number(inputQty)
+  console.log(itemUpdate.quantity)
+  
+  const dataSave = JSON.stringify(itemUpdate.quantity)
+  console.log(dataSave)
+  localStorage.setItem("cart", dataSave)
 }
 
 //Fonction limite de quantité totale
@@ -123,9 +128,13 @@ function addLs(product, qty) {
 //   }
 // }
 
-function makeDeleteItem() {
+function makeDeleteItem(product) {
   const divContainerDelete = document.createElement("div");
   divContainerDelete.classList.add("cart__item__content__settings__delete");
+  divContainerDelete.addEventListener("click", () => {
+    const itemToDelete = cartObject.findIndex((item) => item.id === product)
+    cartObject.splice(itemToDelete, 1)
+  })
   const deleteItems = document.createElement("p");
   deleteItems.classList.add("deleteItem");
   deleteItems.textContent = "Supprimer";
