@@ -105,11 +105,8 @@ function makeDivQty(product) {
 function addLs(product, inputQty) {
   const itemUpdate = cartObject.find(itemUpdated => itemUpdated === product)
   itemUpdate.quantity = Number(inputQty)
-  console.log(itemUpdate)
 //Push de la nouvelle valeur quantity vers le Local Storage
-  const dataSave = JSON.stringify(itemUpdate)
-  console.log(dataSave)
-  localStorage.setItem("cart", dataSave)
+  localStorage.setItem("cart", JSON.stringify(cartObject))
 }
 
 //Fonction limite de quantité totale
@@ -135,7 +132,7 @@ function makeDeleteItem(product) {
   deleteItems.classList.add("deleteItem");
   deleteItems.textContent = "Supprimer";
   divContainerDelete.addEventListener("click", () => {
-    const itemToDelete = cartObject.findIndex((item) => item.id === product.id)
+    const itemToDelete = cartObject.find((item) => item === product)
     console.log(itemToDelete)
     cartObject.splice(itemToDelete, 1)
     console.log(cartObject.lenght)
