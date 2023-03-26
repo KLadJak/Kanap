@@ -101,12 +101,11 @@ function makeDivQty(product) {
   inputQty.addEventListener("change", () => addLs(product, inputQty.value))
   return divQty;
 }
-console.log(cartObject)
 //Fonction de changement de la value de quantity
 function addLs(product, inputQty) {
-  const itemUpdate = cartObject.findIndex(itemUpdated => itemUpdated.id === product.id)
+  const itemUpdate = cartObject.find(itemUpdated => itemUpdated === product)
   itemUpdate.quantity = Number(inputQty)
-  console.log(itemUpdate.quantity)
+  console.log(itemUpdate)
 //Push de la nouvelle valeur quantity vers le Local Storage
   const dataSave = JSON.stringify(itemUpdate)
   console.log(dataSave)
