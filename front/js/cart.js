@@ -101,14 +101,14 @@ function makeDivQty(product) {
   inputQty.addEventListener("change", () => addLs(product, inputQty.value))
   return divQty;
 }
-console.log(cartGet)
+console.log(cartObject)
 //Fonction de changement de la value de quantity
 function addLs(product, inputQty) {
   const itemUpdate = cartObject.findIndex(itemUpdated => itemUpdated.id === product.id)
   itemUpdate.quantity = Number(inputQty)
   console.log(itemUpdate.quantity)
-  
-  const dataSave = JSON.stringify(itemUpdate.quantity)
+//Push de la nouvelle valeur quantity vers le Local Storage
+  const dataSave = JSON.stringify(itemUpdate)
   console.log(dataSave)
   localStorage.setItem("cart", dataSave)
 }
@@ -128,16 +128,19 @@ function addLs(product, inputQty) {
 //   }
 // }
 
+//Fonction de suppression d'un item dans la clé "cart" du Ls
 function makeDeleteItem(product) {
   const divContainerDelete = document.createElement("div");
   divContainerDelete.classList.add("cart__item__content__settings__delete");
-  divContainerDelete.addEventListener("click", () => {
-    const itemToDelete = cartObject.findIndex((item) => item.id === product)
-    cartObject.splice(itemToDelete, 1)
-  })
   const deleteItems = document.createElement("p");
   deleteItems.classList.add("deleteItem");
   deleteItems.textContent = "Supprimer";
+  divContainerDelete.addEventListener("click", () => {
+    const itemToDelete = cartObject.findIndex((item) => item.id === product.id)
+    console.log(itemToDelete)
+    cartObject.splice(itemToDelete, 1)
+    console.log(cartObject.lenght)
+  })
   divContainerDelete.appendChild(deleteItems);
   return divContainerDelete;
 }
