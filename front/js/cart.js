@@ -5,32 +5,34 @@ const cartObject = JSON.parse(cartGet);
 
 //fetch API
 function fetchAPI() {
-  cartObject.map(product => {
-   return fetch(`http://localhost:3000/api/products/${product.id}`)
-    .then((response) => response.json())
-    .then((data) => displayItems(data, product));
-  })
+  cartObject.map((product) => {
+    return fetch(`http://localhost:3000/api/products/${product.id}`)
+      .then((response) => response.json())
+      .then((data) => displayItems(data, product));
+  });
 }
 
 //Fonction de display des items Cart
 function displayItems(data, product) {
-    const fnctArticle = makeArticle(product);
-    const fnctDivContent = makeDivContent();
-    const fnctDivInfo = makeDivInfo(data, product);
-    const fnctDivConSet = makeDivContainerSettings();
-    const fnctImgCart = makeImgCart(data);
-    const fnctDivQty = makeDivQty(product);
-    const fnctDeleteItem = makeDeleteItem(product);
+  const fnctArticle = makeArticle(product);
+  const fnctDivContent = makeDivContent();
+  const fnctDivInfo = makeDivInfo(data, product);
+  const fnctDivConSet = makeDivContainerSettings();
+  const fnctImgCart = makeImgCart(data);
+  const fnctDivQty = makeDivQty(product);
+  const fnctDeleteItem = makeDeleteItem(product);
+  totalQty();
+  totalPrice(data)
 
-    const section = document.querySelector("#cart__items");
+  const section = document.querySelector("#cart__items");
 
-    section.appendChild(fnctArticle);
-    fnctArticle.appendChild(fnctImgCart);
-    fnctArticle.appendChild(fnctDivContent);
-    fnctDivContent.appendChild(fnctDivInfo);
-    fnctDivContent.appendChild(fnctDivConSet);
-    fnctDivConSet.appendChild(fnctDivQty);
-    fnctDivConSet.appendChild(fnctDeleteItem);
+  section.appendChild(fnctArticle);
+  fnctArticle.appendChild(fnctImgCart);
+  fnctArticle.appendChild(fnctDivContent);
+  fnctDivContent.appendChild(fnctDivInfo);
+  fnctDivContent.appendChild(fnctDivConSet);
+  fnctDivConSet.appendChild(fnctDivQty);
+  fnctDivConSet.appendChild(fnctDeleteItem);
 }
 
 //Fonction création Article
@@ -46,10 +48,10 @@ function makeArticle(product) {
 function makeImgCart(data) {
   const div = document.createElement("div");
   div.classList.add("cart__item__img");
-      const image = document.createElement("img");
-      image.src = data.imageUrl;
-      image.alt = data.altTxt;
-      div.appendChild(image);
+  const image = document.createElement("img");
+  image.src = data.imageUrl;
+  image.alt = data.altTxt;
+  div.appendChild(image);
   return div;
 }
 
@@ -98,31 +100,32 @@ function makeDivQty(product) {
   inputQty.max = "100";
   inputQty.value = product.quantity;
   divQty.appendChild(inputQty);
-  inputQty.addEventListener("change", () => addLs(product, inputQty.value))
+  inputQty.addEventListener("change", () => addLs(product, inputQty.value));
   return divQty;
 }
 //Fonction de changement de la value de quantity
 function addLs(product, inputQty) {
-  const itemUpdate = cartObject.find(itemUpdated => itemUpdated === product)
-  itemUpdate.quantity = Number(inputQty)
-//Push de la nouvelle valeur quantity vers le Local Storage
-  localStorage.setItem("cart", JSON.stringify(cartObject))
+  const itemUpdate = cartObject.find((itemUpdated) => itemUpdated === product);
+  itemUpdate.quantity = Number(inputQty);
+  //Push de la nouvelle valeur quantity vers le Local Storage
+  reducer(cartObject);
+  location.reload()
 }
 
 //Fonction limite de quantité totale
-// function reducer(ls) {
-//   let sommeQty = ls.reduce((accumulateur, element) => {
-//     return accumulateur + element.quantity
-//   }, 0)
-//   if (sommeQty > 100) {
-//     return alert("Vous ne pouvez pas ajouter plus de 100 produits");
-//   }
-//   //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
-//   else  {
-//     localStorage.setItem("cart", JSON.stringify(ls));
-//     alert("Votre produit a été ajouté à votre panier");
-//   }
-// }
+function reducer(product) {
+  let sommeQty = product.reduce((accumulateur, element) => {
+    return accumulateur + element.quantity;
+  }, 0);
+  if (sommeQty > 100) {
+    return alert("Vous ne pouvez pas ajouter plus de 100 produits")
+  }
+  //si quantité < 100 -> Message d'alerte + ajout du produit par accumulation
+  else {
+    localStorage.setItem("cart", JSON.stringify(cartObject));
+    alert("Votre produit a été ajouté à votre panier");
+  }
+}
 
 //Fonction de suppression d'un item dans la clé "cart" du Ls
 function makeDeleteItem(product) {
@@ -132,13 +135,36 @@ function makeDeleteItem(product) {
   deleteItems.classList.add("deleteItem");
   deleteItems.textContent = "Supprimer";
   divContainerDelete.addEventListener("click", () => {
-    const itemToDelete = cartObject.findIndex((item) => item === product)
-    cartObject.splice(itemToDelete, 1)
-    localStorage.setItem("cart", JSON.stringify(cartObject))
+    const itemToDelete = cartObject.findIndex((item) => item === product);
+    cartObject.splice(itemToDelete, 1);
+    localStorage.setItem("cart", JSON.stringify(cartObject));
     location.reload();
-  })
+  });
   divContainerDelete.appendChild(deleteItems);
   return divContainerDelete;
 }
 
+function totalQty() {
+  const totalQuant = document.querySelector("#totalQuantity")
+  totalQuant.textContent = cartObject.reduce((accumulateur, product) => accumulateur + product.quantity, 0)
+}
+
+function totalPrice(data) {
+  // cartObject.forEach(product => {
+  // const totalPrix = document.querySelector("#totalPrice")
+  //   let sumPrice = data.price * product.quantity 
+  //   console.log(sumPrice)
+  //   totalPrix.textContent = total + sumPrice 
+  // })
+  const zoneTotalPrice = document.querySelector("#totalPrice");
+  let finalTotalPrice = [];
+  cartObject.forEach((product) => { 
+    let sousTotal = product.quantity * data.price;
+    finalTotalPrice.push(sousTotal);
+  console.log(finalTotalPrice);
+    const reducer = (accumulator, currentValue) => accumulator + currentValue;
+    zoneTotalPrice.textContent = finalTotalPrice.reduce(reducer, 0);
+    console.log(zoneTotalPrice.textContent)
+})
+}
 fetchAPI();
