@@ -22,7 +22,7 @@ function displayItems(data, product) {
   const fnctDivQty = makeDivQty(product);
   const fnctDeleteItem = makeDeleteItem(product);
   totalQty();
-  totalPrice(data)
+  totalPrice(data, product)
 
   const section = document.querySelector("#cart__items");
 
@@ -149,22 +149,12 @@ function totalQty() {
   totalQuant.textContent = cartObject.reduce((accumulateur, product) => accumulateur + product.quantity, 0)
 }
 
-function totalPrice(data) {
-  // cartObject.forEach(product => {
-  // const totalPrix = document.querySelector("#totalPrice")
-  //   let sumPrice = data.price * product.quantity 
-  //   console.log(sumPrice)
-  //   totalPrix.textContent = total + sumPrice 
-  // })
+let finalTotalPrice = [];
+function totalPrice(data, product) {
   const zoneTotalPrice = document.querySelector("#totalPrice");
-  let finalTotalPrice = [];
-  cartObject.forEach((product) => { 
     let sousTotal = product.quantity * data.price;
     finalTotalPrice.push(sousTotal);
-  console.log(finalTotalPrice);
     const reducer = (accumulator, currentValue) => accumulator + currentValue;
     zoneTotalPrice.textContent = finalTotalPrice.reduce(reducer, 0);
-    console.log(zoneTotalPrice.textContent)
-})
 }
 fetchAPI();
